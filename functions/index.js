@@ -32,23 +32,23 @@ const db = getFirestore();
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
 
-exports.updateFollowersCount = onDocumentCreated(
-    "followers/{followerId}/user-followers/{userId}",
+exports.updateFollowingCount = onDocumentCreated(
+    "following/{userId}/user-following/{followerId}",
     async (event) => {
-      const userId = event.params.userId;
+      const followerId = event.params.followerId;
       const userSnapshot = event.data.data();
       const usersRef = db.collection("users");
 
-      await usersRef.doc(userId).update({
+      await usersRef.doc(followerId).update({
         followersCount: userSnapshot.followersCount,
       });
 
-      logger.log(`Updating followers count for user with id ${userId}.`);
+      logger.log(`Updating followers count for user with id ${followerId}.`);
     },
 );
 
-exports.updateFollowingCount = onDocumentCreated(
-    "following/{userId}/user-following/{followerId}",
+exports.updateFollowersCount = onDocumentCreated(
+    "followers/{followerId}/user-followers/{userId}",
     async (event) => {
       const userId = event.params.userId;
       const userSnapshot = event.data.data();
