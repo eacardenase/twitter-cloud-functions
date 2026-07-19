@@ -9,7 +9,10 @@
 
 const {initializeApp} = require("firebase-admin/app");
 const {setGlobalOptions} = require("firebase-functions");
-const {onDocumentCreated} = require("firebase-functions/v2/firestore");
+const {
+  onDocumentCreated,
+  onDocumentDeleted,
+} = require("firebase-functions/v2/firestore");
 const logger = require("firebase-functions/logger");
 const {getFirestore} = require("firebase-admin/firestore");
 
@@ -58,6 +61,38 @@ exports.updateFollowersCount = onDocumentCreated(
         followingCount: userSnapshot.followingCount,
       });
 
+      logger.log(`Updating following count for user with id ${userId}.`);
+    },
+);
+
+exports.removeFollowing = onDocumentDeleted(
+    "following/{userId}/user-following/{followerId}",
+    async (event) => {
+      const followerId = event.params.followerId;
+      const userSnapshot = event.data.data();
+      const usersRef = db.collection("users");
+
+      await usersRef.doc(followerId).update({
+        followersCount: userSnapshot.followersCount - 1,
+      });
+
+      logger.log(userSnapshot);
+      logger.log(`Updating followers count for user with id ${followerId}.`);
+    },
+);
+
+exports.removeFollower = onDocumentDeleted(
+    "followers/{followerId}/user-followers/{userId}",
+    async (event) => {
+      const userId = event.params.userId;
+      const userSnapshot = event.data.data();
+      const usersRef = db.collection("users");
+
+      await usersRef.doc(userId).update({
+        followingCount: userSnapshot.followingCount - 1,
+      });
+
+      logger.log(userSnapshot);
       logger.log(`Updating following count for user with id ${userId}.`);
     },
 );
