@@ -96,3 +96,19 @@ exports.removeFollower = onDocumentDeleted(
       logger.log(`Updating following count for user with id ${userId}.`);
     },
 );
+
+exports.likeTweet = onDocumentCreated(
+    "users/{userId}/tweet-likes/{tweetId}",
+    async (event) => {
+      const tweetId = event.params.tweetId;
+      const tweetSnapshot = event.data.data();
+      const tweetsRef = db.collection("tweets");
+
+      await tweetsRef.doc(tweetId).update({
+        likes: tweetSnapshot.likes,
+      });
+
+      logger.log(tweetSnapshot);
+      logger.log(`Updating likes count for tweet with id ${tweetId}.`);
+    },
+);
