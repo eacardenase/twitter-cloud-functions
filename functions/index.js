@@ -112,3 +112,19 @@ exports.likeTweet = onDocumentCreated(
       logger.log(`Updating likes count for tweet with id ${tweetId}.`);
     },
 );
+
+exports.unlikeTweet = onDocumentDeleted(
+    "users/{userId}/tweet-likes/{tweetId}",
+    async (event) => {
+      const tweetId = event.params.tweetId;
+      const tweetSnapshot = event.data.data();
+      const tweetsRef = db.collection("tweets");
+
+      await tweetsRef.doc(tweetId).update({
+        likes: tweetSnapshot.likes - 1,
+      });
+
+      logger.log(tweetSnapshot);
+      logger.log(`Updating likes count for tweet with id ${tweetId}.`);
+    },
+);
