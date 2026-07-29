@@ -117,8 +117,8 @@ exports.unlikeTweet = onDocumentDeleted(
     "users/{userId}/tweet-likes/{tweetId}",
     async (event) => {
       const tweetId = event.params.tweetId;
-      const tweetSnapshot = event.data.data();
       const tweetsRef = db.collection("tweets");
+      const tweetSnapshot = await tweetsRef.doc(tweetId).get();
 
       await tweetsRef.doc(tweetId).update({
         likes: tweetSnapshot.likes - 1,
